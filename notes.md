@@ -14,6 +14,37 @@
 
 > concurrency 
 * https://docs.python.org/3/library/asyncio.html
+* he traditional choice is to use threads.
+    * https://docs.python.org/3/library/threading.html
+> asyncio uses single-threaded cooperative multitasking and an event loop to manage tasks.
+> With select(), allows you to check for I/O completion on more than one socket.
+    * allows you to check for I/O completion on more than one socket.
+> John Reese - Thinking Outside the GIL with AsyncIO and Multiprocessing - PyCon 2018
+* https://youtu.be/0kXaLh8Fz3k
+* multiprocessing in python comes with its own gil
+* pool.map
+* con: 
+    * each process can only execute one task at a time
+> AsyncIO
+* based on futures
+* faster than threads
+* massive i/o concurrency
+> GIL
+* global interpreter lock
+* piece of python runtime that prevents multiple threads from executing on the VM at the same time
+* it also prevents concurent memory access to python objects
+
+```
+import asyncio
+
+async def main():
+    print('Hello ...')
+    await asyncio.sleep(1)
+    print('... World!')
+
+# Python 3.7+
+asyncio.run(main())
+```
 
 ## addendum
 > Note: Security precautions and best practices still apply, even if your application isn’t “security-sensitive.” If your application accesses the network, it should be secured and maintained. This means, at a minimum:
