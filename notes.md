@@ -63,9 +63,19 @@ asyncio.run(main())
 ```
 ```
 # example boiler plate for AsyncIO w/ multiprocessing
-
+# tx,rx work queue and result queue
 async def run_loop(tx,rx):
-    pass # real work
+    limit = 10
+    pending = set()
+    while True:
+        while len(pending) < limit:
+            task = tx.get_nowait()
+            fn, args, kwargs = task
+            pending.add(fn(*args, **kwargs))
+        
+        done, pending = await asyncio.wait(pending, ...)
+        for future in done:
+            rx.put_nowait(await future)
 
 def bootstrap(tx,rx):
     loop = asyncio.new_event_loop()
@@ -78,6 +88,37 @@ def main():
         args = (tx, rx)
     )
     p.start()
+```
+> a little nicer
+* create a pool class that automatically instanctiates the child processes
+* a helper function within class that can queue an individual item of work
+* the helper function could give a unique integer Id for the task back as the result
+* we then could have a a helper function that awaits the result given the task ID
+```
+class Pool:
+    async def queue(self, fn, *args, **kwargs) -> int: ...
+    async def result(self, id) -> Any: ...
+
+    async def map(self, fn, items):
+        task_ids = [
+            await self.queue(fn, (item,), {})
+            for item in items
+        ]
+    return [
+        await self.result(task_id)
+        for task_id in task_ids
+    ]
+```
+```
+# implementing pool class
+
+async def fetch_url(url):
+    return await aiohttp.request('GET', url)
+
+async def fetch_all(urls):
+    async with Pool() as pool:
+        results = await pool.map(fetch_url, urls)
+
 ```
 ## addendum
 > Note: Security precautions and best practices still apply, even if your application isn’t “security-sensitive.” If your application accesses the network, it should be secured and maintained. This means, at a minimum:
