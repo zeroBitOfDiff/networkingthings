@@ -15,3 +15,5 @@
 
 * Make sure that request data is sanitized and validated as much as possible prior to calling other code that processes it. Use (fuzz) tests for this and run them regularly.
 
+> For TLS,
+* https://docs.python.org/3/library/ssl.html
