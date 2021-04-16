@@ -39,6 +39,12 @@
 > ideal
 * we want the io concurrency of asyncIO
 * processing concurrency of multi-processing
+> multiprocessing and AsyncIO
+* use the primitives that we get from multiprocessing module
+* run an asyncIO event loop on each child process
+* use the multiprocessing queues as communication from the parent to the child processes
+* this will beef up AsyncIO 
+    * ie, if we have 100 concurrent requests on a single async process, we can have 1000 concurrent requests if we had 10 processes running in parrallel. 
 > GIL
 * global interpreter lock
 * piece of python runtime that prevents multiple threads from executing on the VM at the same time
@@ -55,7 +61,24 @@ async def main():
 # Python 3.7+
 asyncio.run(main())
 ```
+```
+# example boiler plate for AsyncIO w/ multiprocessing
 
+async def run_loop(tx,rx):
+    pass # real work
+
+def bootstrap(tx,rx):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(run_loop(tx,rx))
+
+def main():
+    p = multiprocessing.Process(
+        target = bootstrap,
+        args = (tx, rx)
+    )
+    p.start()
+```
 ## addendum
 > Note: Security precautions and best practices still apply, even if your application isn’t “security-sensitive.” If your application accesses the network, it should be secured and maintained. This means, at a minimum:
 
