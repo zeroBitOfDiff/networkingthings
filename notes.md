@@ -29,6 +29,16 @@
 * based on futures
 * faster than threads
 * massive i/o concurrency
+> AsyncIO rework
+* make function into co routine instead of regular function
+* when you call a co-routine you're not actually starting the execution of the function immediately. You're just getting a future back. It's only once you start to await that future that the co-routine will start getting scheduled for execution on the event loop. 
+* essentially if the co-routine is called twice, it does not start to executie immediately because it returns the futures. We can then use the asyncIO gather helper which will do an await on all the futures you give it at the same time. Once those futures have completed, then it gives you the results back from those futures. 
+>asyncIO con
+* still limited by GIL ( only running on one process )
+* beware timeouts and queue length
+> ideal
+* we want the io concurrency of asyncIO
+* processing concurrency of multi-processing
 > GIL
 * global interpreter lock
 * piece of python runtime that prevents multiple threads from executing on the VM at the same time
