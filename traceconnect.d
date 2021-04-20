@@ -2,7 +2,7 @@ struct sockaddr_in{
   short             sin_family;
   unsigned short    sin_port;
   in_addr_t         sin_addr;
-  char              sin_zer[8];  
+  char              sin_zero[8];  
 };
 
 syscall::connect:entry
